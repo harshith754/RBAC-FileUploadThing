@@ -1,13 +1,24 @@
 "use client";
 import { setRole, removeRole } from "./actions";
 import { ROLES } from "@/types/roles";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 interface AdminUserListProps {
   users: any[];
   isSuperAdmin: boolean;
 }
 
-export default function AdminUserList({ users, isSuperAdmin }: AdminUserListProps) {
+export default function AdminUserList({
+  users,
+  isSuperAdmin,
+}: AdminUserListProps) {
   return (
     <>
       {users.map((user) => (
@@ -35,28 +46,47 @@ export default function AdminUserList({ users, isSuperAdmin }: AdminUserListProp
             </div>
           </div>
           <div className="flex gap-2">
-            {isSuperAdmin &&
-              ROLES.map((role) => (
-                <form action={setRole} className="inline" key={role}>
-                  <input type="hidden" value={user.id} name="id" />
-                  <input type="hidden" value={role} name="role" />
-                  <button
-                    type="submit"
-                    className="px-2 py-1 text-sm border border-neutral-300 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-700"
-                  >
-                    Make {role.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                  </button>
-                </form>
-              ))}
             {isSuperAdmin && (
-              <form action={removeRole} className="inline">
+              <form action={setRole} className="flex gap-2 items-center">
                 <input type="hidden" value={user.id} name="id" />
-                <button
+                <Select
+                  name="role"
+                  defaultValue={user.publicMetadata.role as string}
+                >
+                  <SelectTrigger className="w-32 h-8 text-xs">
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLES.map((role) => (
+                      <SelectItem value={role} key={role} className="text-xs">
+                        {role
+                          .replace("-", " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
                   type="submit"
-                  className="px-2 py-1 text-sm border border-neutral-300 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                  size="sm"
+                  variant="outline"
+                  className="px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                >
+                  Change Role
+                </Button>
+              </form>
+            )}
+            {isSuperAdmin && (
+              <form action={removeRole} className="flex gap-2 items-center">
+                <input type="hidden" value={user.id} name="id" />
+                <Button
+                  type="submit"
+                  size="sm"
+                  variant="outline"
+                  className="px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-700"
                 >
                   Remove Role
-                </button>
+                </Button>
               </form>
             )}
           </div>
