@@ -1,6 +1,6 @@
 "use client";
 import { setRole, removeRole } from "./actions";
-import { ROLES } from "@/types/roles";
+import { ROLES, AdminUser } from "@/types/roles";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 
 interface AdminUserListProps {
-  users: any[];
+  users: AdminUser[];
   isSuperAdmin: boolean;
 }
 
@@ -37,7 +37,7 @@ export default function AdminUserList({
             <div className="dark:text-neutral-200">
               {
                 user.emailAddresses.find(
-                  (email: any) => email.id === user.primaryEmailAddressId
+                  (email) => email.id === user.primaryEmailAddressId
                 )?.emailAddress
               }
             </div>

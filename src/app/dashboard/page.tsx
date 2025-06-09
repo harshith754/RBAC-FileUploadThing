@@ -1,12 +1,13 @@
 import { ROLES_ENUM } from "@/types/roles";
 import { currentUser } from "@clerk/nextjs/server";
 import React from "react";
+import type { AdminUser } from "@/types/roles";
 
 function AdminOnly({
   user,
   children,
 }: {
-  user: any;
+  user: AdminUser | null | undefined;
   children: React.ReactNode;
 }) {
   if (user?.publicMetadata?.role === ROLES_ENUM.ADMIN) {
@@ -19,7 +20,7 @@ function SuperAdminOnly({
   user,
   children,
 }: {
-  user: any;
+  user: AdminUser | null | undefined;
   children: React.ReactNode;
 }) {
   if (user?.publicMetadata?.role === ROLES_ENUM.SUPER_ADMIN) {
@@ -32,7 +33,7 @@ function UserOnly({
   user,
   children,
 }: {
-  user: any;
+  user: AdminUser | null | undefined;
   children: React.ReactNode;
 }) {
   if (user?.publicMetadata?.role === ROLES_ENUM.USER) {
@@ -52,19 +53,19 @@ export default async function Page() {
         This is the dashboard page where you can manage your files.
       </p>
       <div className="space-y-4">
-        <SuperAdminOnly user={user}>
+        <SuperAdminOnly user={user as AdminUser}>
           <div className="p-3 rounded border-l-4 border-red-500 bg-red-50 dark:bg-red-900/40 text-red-900 dark:text-red-200 font-medium shadow-sm">
             <span className="font-semibold">Super Admin: </span>
             This is only visible to super admins.
           </div>
         </SuperAdminOnly>
-        <AdminOnly user={user}>
+        <AdminOnly user={user as AdminUser}>
           <div className="p-3 rounded border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/40 text-yellow-900 dark:text-yellow-200 font-medium shadow-sm">
             <span className="font-semibold">Admin: </span>
             This is only visible to admins.
           </div>
         </AdminOnly>
-        <UserOnly user={user}>
+        <UserOnly user={user as AdminUser}>
           <div className="p-3 rounded border-l-4 border-green-500 bg-green-50 dark:bg-green-900/40 text-green-900 dark:text-green-200 font-medium shadow-sm">
             <span className="font-semibold">User: </span>
             This is only visible to regular users.

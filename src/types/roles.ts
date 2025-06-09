@@ -23,3 +23,20 @@ declare global {
     };
   }
 }
+
+export interface UserEmail {
+  id: string;
+  emailAddress: string;
+}
+
+export interface AdminUser {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  publicMetadata: {
+    role?: Roles;
+    [key: string]: unknown;
+  };
+  primaryEmailAddressId: string;
+  emailAddresses: UserEmail[];
+}
