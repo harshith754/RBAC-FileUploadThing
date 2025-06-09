@@ -11,13 +11,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { ROLES_ENUM } from "@/types/roles";
 
 export const Navigation = () => {
   const { isLoaded, user } = useUser();
   const pathname = usePathname();
   const isAdmin =
-    user?.publicMetadata?.role === "admin" ||
-    user?.publicMetadata?.role === "super-admin";
+    user?.publicMetadata?.role === ROLES_ENUM.ADMIN ||
+    user?.publicMetadata?.role === ROLES_ENUM.SUPER_ADMIN;
   const isOnAdminPage = pathname.startsWith("/admin");
 
   return (
