@@ -6,27 +6,56 @@ export default async function Page() {
   const { userId } = await auth();
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-white dark:from-neutral-900 dark:to-neutral-950">
-      <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg p-10 flex flex-col items-center gap-6 border border-neutral-200 dark:border-neutral-800">
-        <h1 className="text-4xl font-bold text-blue-700 dark:text-blue-300 mb-2">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-white dark:from-neutral-900 dark:to-neutral-950 px-4 py-8">
+      <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg p-6 sm:p-8 md:p-10 flex flex-col items-center gap-4 sm:gap-6 border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-700 dark:text-blue-300 mb-2 text-center leading-tight">
           Welcome to FileUpload RBAC Demo
         </h1>
-        <p className="text-lg text-neutral-700 dark:text-neutral-300 mb-4 text-center max-w-xl">
+
+        <p className="text-base sm:text-lg text-neutral-700 dark:text-neutral-300 mb-4 text-center max-w-xl leading-relaxed">
           This is a demo application for role-based access control and file
           uploads. Sign in to access your dashboard, or explore the landing page
           as a guest.
         </p>
+
         {userId ? (
-          <Button asChild variant="default">
-            <Link href="/dashboard">Go to Dashboard</Link>
+          <Button
+            asChild
+            variant="default"
+            className="w-full sm:w-auto min-w-[160px] h-10 sm:h-12"
+          >
+            <Link
+              href="/dashboard"
+              className="text-sm sm:text-base font-medium"
+            >
+              Go to Dashboard
+            </Link>
           </Button>
         ) : (
-          <div className="flex gap-4">
-            <Button asChild variant="default">
-              <Link href="/sign-in">Sign In</Link>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <Button
+              asChild
+              variant="default"
+              className="w-full sm:w-auto min-w-[100px] h-10 sm:h-12"
+            >
+              <Link
+                href="/sign-in"
+                className="text-sm sm:text-base font-medium"
+              >
+                Sign In
+              </Link>
             </Button>
-            <Button asChild variant="default">
-              <Link href="/sign-up">Sign Up</Link>
+            <Button
+              asChild
+              variant="outline"
+              className="w-full sm:w-auto min-w-[100px] h-10 sm:h-12"
+            >
+              <Link
+                href="/sign-up"
+                className="text-sm sm:text-base font-medium"
+              >
+                Sign Up
+              </Link>
             </Button>
           </div>
         )}
