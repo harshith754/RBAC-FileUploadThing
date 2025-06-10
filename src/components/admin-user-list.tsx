@@ -1,5 +1,5 @@
 "use client";
-import { setRole, removeRole } from "./actions";
+import { setRole, removeRole } from "../app/admin/actions";
 import { ROLES, AdminUser } from "@/types/roles";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,7 +49,7 @@ export default function AdminUserList({
                 </span>
               </div>
             </div>
-            
+
             {isSuperAdmin && (
               <div className="flex flex-col gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-700">
                 <form action={setRole} className="flex gap-2 items-center">
@@ -112,7 +112,7 @@ export default function AdminUserList({
                 {user.publicMetadata.role as string}
               </div>
             </div>
-            
+
             {isSuperAdmin && (
               <div className="flex gap-2 flex-shrink-0">
                 <form action={setRole} className="flex gap-2 items-center">

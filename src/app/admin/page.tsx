@@ -1,6 +1,6 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import { auth } from "@clerk/nextjs/server";
-import AdminUserList from "./AdminUserList";
+import AdminUserList from "@/components/admin-user-list";
 import { ROLES_ENUM, AdminUser, UserEmail } from "@/types/roles";
 
 export default async function Admin() {
