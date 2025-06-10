@@ -4,42 +4,14 @@ import { useDropzone, FileRejection } from "react-dropzone";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/utils/file-upload";
+import { cn,uploadFile } from "@/utils/file-upload";
 import type { UploadQueueItem } from "@/types/file-upload";
 import UploadQueueList from "@/components/file-upload/upload-queue-list";
+import Dropzone from "./dropzone";
 
 const FileUploadComponent: React.FC = () => {
   const [uploadQueue, setUploadQueue] = useState<UploadQueueItem[]>([]);
-
-  const uploadFile = async (
-    file: File,
-    updateProgress: (progress: number) => void
-  ): Promise<{ success: boolean; url: string; message: string }> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    return new Promise((resolve) => {
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 20;
-        if (progress >= 100) {
-          progress = 100;
-          clearInterval(interval);
-          setTimeout(() => {
-            resolve({
-              success: Math.random() > 0.2,
-              url: `https://example.com/files/${file.name}`,
-              message:
-                Math.random() > 0.2
-                  ? "Upload successful"
-                  : "Server validation failed",
-            });
-          }, 500);
-        }
-        updateProgress(Math.min(progress, 100));
-      }, 300);
-    });
-  };
-
+  
   const onDrop = useCallback(
     async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       rejectedFiles.forEach(({ file, errors }) => {
@@ -112,20 +84,6 @@ const FileUploadComponent: React.FC = () => {
     []
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      "image/jpeg": [".jpg", ".jpeg"],
-      "image/png": [".png"],
-      "application/json": [".json"],
-      "text/csv": [".csv"],
-    },
-    maxSize: 1 * 1024 * 1024, // 1 mb
-    multiple: true,
-    noClick: false,
-    noKeyboard: false,
-  });
-
   const removeFile = (fileId: string): void => {
     setUploadQueue((prev) => prev.filter((f) => f.id !== fileId));
   };
@@ -134,35 +92,7 @@ const FileUploadComponent: React.FC = () => {
     <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
       <Card className="border-none shadow-none">
         <CardContent className="p-0">
-          <div
-            {...getRootProps()}
-            className={cn(
-              "border-2 border-dashed rounded-lg p-4 sm:p-8 text-center cursor-pointer transition-colors",
-              isDragActive
-                ? "border-primary bg-primary/5"
-                : "border-muted-foreground/25 hover:border-muted-foreground/50"
-            )}
-          >
-            <input {...getInputProps()} />
-            <Upload
-              className={cn(
-                "h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4",
-                isDragActive ? "text-primary" : "text-muted-foreground"
-              )}
-            />
-            {isDragActive ? (
-              <p className="text-primary font-medium">Drop files here...</p>
-            ) : (
-              <div className="space-y-2">
-                <p className="text-base sm:text-lg font-medium">
-                  Drag & drop files here, or click to select
-                </p>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Supports: JPG, JPEG, PNG, JSON, CSV files (max 1MB each)
-                </p>
-              </div>
-            )}
-          </div>
+          <Dropzone onDrop={onDrop}/>
         </CardContent>
       </Card>
 

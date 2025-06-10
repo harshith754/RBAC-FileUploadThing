@@ -2,7 +2,7 @@ import { ROLES_ENUM } from "@/types/roles";
 import { currentUser } from "@clerk/nextjs/server";
 import React from "react";
 import type { AdminUser } from "@/types/roles";
-import  FileUploadComponent  from "@/components/file-upload/file-upload";
+import  FileUploadComponent  from "@/components/file-upload/upload-component";
 
 function AdminOnly({
   user,

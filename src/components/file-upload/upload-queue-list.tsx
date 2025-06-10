@@ -8,7 +8,7 @@ import {
   StatusBadge,
   ErrorAlert,
   MessageAlert,
-} from "@/components/file-upload/file-upload-ui";
+} from "@/components/file-upload/upload-status-ui";
 import { formatFileSize } from "@/utils/file-upload";
 import type { UploadQueueItem } from "@/types/file-upload";
 
