@@ -2,6 +2,7 @@ import { ROLES_ENUM } from "@/types/roles";
 import { currentUser } from "@clerk/nextjs/server";
 import React from "react";
 import type { AdminUser } from "@/types/roles";
+import  FileUploadComponent  from "@/components/file-upload/file-upload";
 
 function AdminOnly({
   user,
@@ -52,6 +53,9 @@ export default async function Page() {
       <p className="mb-6 text-neutral-700 dark:text-neutral-300">
         This is the dashboard page where you can manage your files.
       </p>
+
+      <FileUploadComponent />
+
       <div className="space-y-4">
         <SuperAdminOnly user={user as AdminUser}>
           <div className="p-3 rounded border-l-4 border-red-500 bg-red-50 dark:bg-red-900/40 text-red-900 dark:text-red-200 font-medium shadow-sm">
