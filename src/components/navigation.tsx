@@ -13,12 +13,18 @@ import {
   useUser,
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Menu } from "lucide-react";
 import { ROLES_ENUM } from "@/types/roles";
 
-const BUTTON_STYLES = 
+const BUTTON_STYLES =
   "w-full md:w-auto rounded-md border border-neutral-300 dark:border-neutral-600 text-neutral-800 dark:text-neutral-200 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 shadow-sm transition text-sm py-2 px-3 md:text-base md:py-2.5 md:px-4";
 
 export const Navigation = () => {
@@ -29,7 +35,7 @@ export const Navigation = () => {
   const isAdmin = [ROLES_ENUM.ADMIN, ROLES_ENUM.SUPER_ADMIN].includes(
     user?.publicMetadata?.role as ROLES_ENUM
   );
-  const isOnAdminPage = pathname.startsWith("/admin");
+  const isOnAdminPage = pathname?.startsWith("/admin") ?? false;
   const isOnSignInPage = pathname === "/sign-in";
   const isOnSignUpPage = pathname === "/sign-up";
 
@@ -37,10 +43,10 @@ export const Navigation = () => {
 
   const AdminNavLink = () => {
     if (!isAdmin) return null;
-    
+
     const href = isOnAdminPage ? "/dashboard" : "/admin";
     const label = isOnAdminPage ? "Dashboard" : "Manage Users";
-    
+
     return (
       <Link href={href} onClick={closeSheet}>
         <Button variant="outline" className={BUTTON_STYLES}>
@@ -68,7 +74,7 @@ export const Navigation = () => {
           </SignUpButton>
         )}
       </SignedOut>
-      
+
       <SignedIn>
         <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4">
           <UserButton />
@@ -105,7 +111,10 @@ export const Navigation = () => {
             <Menu className="h-6 w-6" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="right" className="w-72 sm:w-80 flex flex-col gap-4 pt-12 px-6">
+        <SheetContent
+          side="right"
+          className="w-72 sm:w-80 flex flex-col gap-4 pt-12 px-6"
+        >
           <SheetHeader>
             <VisuallyHidden>
               <SheetTitle>Navigation Menu</SheetTitle>
@@ -128,12 +137,12 @@ export const Navigation = () => {
               File Upload Thing + RBAC
             </h1>
           </div>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-4">
             <NavigationContent />
           </div>
-          
+
           {/* Mobile Navigation */}
           <MobileSheet />
         </div>

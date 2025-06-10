@@ -1,4 +1,3 @@
-
 export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(" ");
 }
@@ -11,33 +10,41 @@ export function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 }
 
-
+import axios, { isAxiosError } from "axios";
 
 export const uploadFile = async (
-    file: File,
-    updateProgress: (progress: number) => void
-  ): Promise<{ success: boolean; url: string; message: string }> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    return new Promise((resolve) => {
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 20;
-        if (progress >= 100) {
-          progress = 100;
-          clearInterval(interval);
-          setTimeout(() => {
-            resolve({
-              success: Math.random() > 0.2,
-              url: `https://example.com/files/${file.name}`,
-              message:
-                Math.random() > 0.2
-                  ? "Upload successful"
-                  : "Server validation failed",
-            });
-          }, 500);
-        }
-        updateProgress(Math.min(progress, 100));
-      }, 300);
+  file: File,
+  updateProgress: (progress: number) => void
+): Promise<{ success: boolean; url?: string; message: string }> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await axios.post("/api/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = Math.round(
+          (progressEvent.loaded * 100) / (progressEvent.total || 1)
+        );
+        updateProgress(percentCompleted);
+      },
     });
-  };
+
+    return {
+      success: true,
+      url: response.data.url,
+      message: response.data.message,
+    };
+  } catch (error) {
+    let message = "Upload failed";
+    if (isAxiosError(error) && error.response?.data?.message) {
+      message = error.response.data.message;
+    }
+    return {
+      success: false,
+      message,
+    };
+  }
+};
