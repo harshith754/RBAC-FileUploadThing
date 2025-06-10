@@ -2,13 +2,12 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { currentUser } from "@clerk/nextjs/server";
-import prisma from '@/lib/prisma';
-
+import prisma from "@/lib/prisma";
 
 export default async function Page() {
-  const { userId } = await auth();
+  const { userId }: { userId: string | null } = await auth();
 
-  if (userId) {    
+  if (userId) {
     await createUserIfNeeded(userId);
   }
 
@@ -18,14 +17,12 @@ export default async function Page() {
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-700 dark:text-blue-300 mb-2 text-center leading-tight">
           Welcome to FileUpload RBAC Demo
         </h1>
-        
+
         <p className="text-base sm:text-lg text-neutral-700 dark:text-neutral-300 mb-4 text-center max-w-xl leading-relaxed">
           This is a demo application for role-based access control and file
           uploads. Sign in to access your dashboard, or explore the landing page
           as a guest.
         </p>
-
-
 
         {userId ? (
           <Button
@@ -72,7 +69,9 @@ export default async function Page() {
     </main>
   );
 }
-async function createUserIfNeeded(userId: string) {
+async function createUserIfNeeded(
+  userId: string
+): Promise<{ success: boolean; data?: unknown; error?: string }> {
   try {
     const user = await currentUser();
     if (!user) {
@@ -86,28 +85,36 @@ async function createUserIfNeeded(userId: string) {
         data: {
           clerkId: user.id,
           email: user.emailAddresses[0]?.emailAddress || "",
-          name: `${user.firstName || ""}${user.lastName ? " " + user.lastName : ""}`.trim() || "Unknown User",
-        }
+          name:
+            `${user.firstName || ""}${
+              user.lastName ? " " + user.lastName : ""
+            }`.trim() || "Unknown User",
+        },
       });
 
       return { success: true, data: newUser };
-
-    } catch (dbError: any) {
-      if (dbError.code === "P2002") {
-        return { 
-          success: false, 
-          error: "User with this email or clerkId already exists" 
+    } catch (dbError) {
+      if (
+        typeof dbError === "object" &&
+        dbError &&
+        "code" in dbError &&
+        (dbError as { code?: string }).code === "P2002"
+      ) {
+        return {
+          success: false,
+          error: "User with this email or clerkId already exists",
         };
       }
       throw dbError;
     }
-
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error creating user:", error);
-    return { 
-      success: false, 
-      error: error.message || "Failed to create user" 
+    return {
+      success: false,
+      error:
+        typeof error === "object" && error && "message" in error
+          ? (error as { message?: string }).message || "Failed to create user"
+          : "Failed to create user",
     };
   }
 }
-
