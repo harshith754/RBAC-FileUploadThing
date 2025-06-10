@@ -18,7 +18,6 @@ export const uploadFile = async (
 ): Promise<{ success: boolean; url?: string; message: string }> => {
   const formData = new FormData();
   formData.append("file", file);
-
   try {
     const response = await axios.post("/api/upload", formData, {
       headers: {
