@@ -1,17 +1,16 @@
 "use client";
 import React, { useState, useCallback } from "react";
-import { useDropzone, FileRejection } from "react-dropzone";
-import { Upload } from "lucide-react";
+import { FileRejection } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { cn,uploadFile } from "@/utils/file-upload";
+import { uploadFile } from "@/utils/file-upload";
 import type { UploadQueueItem } from "@/types/file-upload";
 import UploadQueueList from "@/components/file-upload/upload-queue-list";
 import Dropzone from "./dropzone";
 
 const FileUploadComponent: React.FC = () => {
   const [uploadQueue, setUploadQueue] = useState<UploadQueueItem[]>([]);
-  
+
   const onDrop = useCallback(
     async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       rejectedFiles.forEach(({ file, errors }) => {
@@ -74,7 +73,13 @@ const FileUploadComponent: React.FC = () => {
           setUploadQueue((prev) =>
             prev.map((f) =>
               f.id === fileId
-                ? { ...f, status: "error", message: `Upload failed - ${error instanceof Error ? error.message : String(error)}` }
+                ? {
+                    ...f,
+                    status: "error",
+                    message: `Upload failed - ${
+                      error instanceof Error ? error.message : String(error)
+                    }`,
+                  }
                 : f
             )
           );
@@ -92,7 +97,7 @@ const FileUploadComponent: React.FC = () => {
     <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
       <Card className="border-none shadow-none">
         <CardContent className="p-0">
-          <Dropzone onDrop={onDrop}/>
+          <Dropzone onDrop={onDrop} />
         </CardContent>
       </Card>
 
