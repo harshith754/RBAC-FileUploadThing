@@ -8,9 +8,14 @@ import type { UploadQueueItem } from "@/types/file-upload";
 import UploadQueueList from "@/components/file-upload/upload-queue-list";
 import Dropzone from "./dropzone";
 
-const FileUploadComponent: React.FC = () => {
-  const [uploadQueue, setUploadQueue] = useState<UploadQueueItem[]>([]);
 
+interface FileUploadComponentProps {
+  initialFiles: UploadQueueItem[];
+}
+
+const FileUploadComponent: React.FC<FileUploadComponentProps> = ({initialFiles}) => {
+  const [uploadQueue, setUploadQueue] = useState<UploadQueueItem[]>(initialFiles);
+  
   const onDrop = useCallback(
     async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       rejectedFiles.forEach(({ file, errors }) => {

@@ -26,6 +26,7 @@ export default async function handler(
   }
 
   const { userId } = getAuth(req);
+
   if (!userId) {
     return res.status(401).json({ message: "Not authenticated" });
   }

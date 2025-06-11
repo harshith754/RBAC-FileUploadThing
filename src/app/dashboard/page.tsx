@@ -2,49 +2,18 @@ import { ROLES_ENUM } from "@/types/roles";
 import { currentUser } from "@clerk/nextjs/server";
 import React from "react";
 import type { AdminUser } from "@/types/roles";
-import  FileUploadComponent  from "@/components/file-upload/upload-component";
-
-function AdminOnly({
-  user,
-  children,
-}: {
-  user: AdminUser | null | undefined;
-  children: React.ReactNode;
-}) {
-  if (user?.publicMetadata?.role === ROLES_ENUM.ADMIN) {
-    return <>{children}</>;
-  }
-  return null;
-}
-
-function SuperAdminOnly({
-  user,
-  children,
-}: {
-  user: AdminUser | null | undefined;
-  children: React.ReactNode;
-}) {
-  if (user?.publicMetadata?.role === ROLES_ENUM.SUPER_ADMIN) {
-    return <>{children}</>;
-  }
-  return null;
-}
-
-function UserOnly({
-  user,
-  children,
-}: {
-  user: AdminUser | null | undefined;
-  children: React.ReactNode;
-}) {
-  if (user?.publicMetadata?.role === ROLES_ENUM.USER) {
-    return <>{children}</>;
-  }
-  return null;
-}
+import FileUploadComponent from "@/components/file-upload/upload-component";
+import { getUserFiles } from "../actions/files";
+import {
+  AdminOnly,
+  SuperAdminOnly,
+  UserOnly,
+} from "@/components/rbac/RoleGuards";
 
 export default async function Page() {
   const user = await currentUser();
+
+  const initialFiles = await getUserFiles();
   return (
     <div className="max-w-2xl mx-auto mt-10 p-6 bg-white dark:bg-neutral-900 rounded-lg shadow-md border border-neutral-200 dark:border-neutral-800">
       <h1 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-neutral-100">
@@ -54,7 +23,7 @@ export default async function Page() {
         This is the dashboard page where you can manage your files.
       </p>
 
-      <FileUploadComponent />
+      <FileUploadComponent initialFiles={initialFiles} />
 
       <div className="space-y-4">
         <SuperAdminOnly user={user as AdminUser}>
