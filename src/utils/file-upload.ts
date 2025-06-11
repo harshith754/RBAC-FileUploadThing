@@ -12,14 +12,28 @@ export function formatFileSize(bytes: number): string {
 
 import axios, { isAxiosError } from "axios";
 
+export interface UploadResponse {
+  url: string;
+  message: string;
+  fileId: number;
+}
+
+export interface UploadResult {
+  success: boolean;
+  url?: string;
+  message: string;
+  backendId?: string;
+}
+
 export const uploadFile = async (
   file: File,
   updateProgress: (progress: number) => void
-): Promise<{ success: boolean; url?: string; message: string }> => {
+): Promise<UploadResult> => {
   const formData = new FormData();
   formData.append("file", file);
+
   try {
-    const response = await axios.post("/api/upload", formData, {
+    const response = await axios.post<UploadResponse>("/api/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -35,6 +49,7 @@ export const uploadFile = async (
       success: true,
       url: response.data.url,
       message: response.data.message,
+      backendId: response.data.fileId.toString(),
     };
   } catch (error) {
     let message = "Upload failed";

@@ -17,7 +17,8 @@ export async function getUserFiles(): Promise<UploadQueueItem[]> {
   });
 
   return files.map((file) => ({
-    id: file.id.toString(),
+    id: Math.random().toString(36).substr(2, 9),
+    backendId: file.id.toString(),
     file: new File([], file.name),
     name: file.name,
     status: "completed",
@@ -46,7 +47,8 @@ export async function getAllFiles(): Promise<UploadQueueItem[]> {
   });
 
   return files.map((file) => ({
-    id: file.id.toString(),
+    id: Math.random().toString(36).substr(2, 9),
+    backendId: file.id.toString(),
     file: new File([], file.name),
     name: file.name,
     status: "completed",

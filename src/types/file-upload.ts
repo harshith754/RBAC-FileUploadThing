@@ -3,6 +3,7 @@ export type UploadStatus = "uploading" | "completed" | "error" | "pending";
 
 export interface UploadQueueItem {
   id: string;
+  backendId?: string;
   file: File;
   name: string;
   status: UploadStatus;

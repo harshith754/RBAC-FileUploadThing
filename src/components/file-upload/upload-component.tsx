@@ -81,6 +81,7 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
                     status: result.success ? "completed" : "error",
                     url: result.url,
                     message: result.message,
+                    backendId: result.backendId,
                   }
                 : f
             )
@@ -117,36 +118,71 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
     []
   );
 
+  const deleteInProgress = new Set<string>();
+
   const removeFile = async (fileId: string): Promise<void> => {
-    try {
-      await axios.delete(`/api/files/${fileId}`);
+    if (deleteInProgress.has(fileId)) {
+      return;
+    }
+
+    const file = uploadQueue.find((f) => f.id === fileId);
+
+    if (!file) {
+      toast.error("File not found in queue");
+      return;
+    }
+
+    if (!file.backendId) {
+      toast.warning(`File "${file.name}" was not uploaded to the backend`);
       setUploadQueue((prev) => prev.filter((f) => f.id !== fileId));
-      toast.success("File deleted successfully");
+      return;
+    }
+
+    deleteInProgress.add(fileId);
+
+    const toastId = `delete-${fileId}`;
+    toast.loading(`Deleting ${file.name}...`, { id: toastId });
+
+    try {
+      await axios.delete(`/api/files/${file.backendId}`);
+      setUploadQueue((prev) => prev.filter((f) => f.id !== fileId));
+      toast.success(`Deleted ${file.name} successfully`, { id: toastId });
     } catch (error) {
-      toast.error("Failed to remove file", {
+      toast.error(`Failed to delete ${file.name}`, {
         description: error instanceof Error ? error.message : String(error),
+        id: toastId,
       });
+    } finally {
+      deleteInProgress.delete(fileId);
     }
   };
 
   const handleClearAll = async () => {
     await Promise.all(
       uploadQueue.map(async (item) => {
+        if (!item.backendId) {
+          console.warn(`File "${item.name}" was not uploaded to the backend`);
+          return;
+        }
         try {
-          const res = await fetch(`/api/files/${item.id}`, {
+          const res = await fetch(`/api/files/${item.backendId}`, {
             method: "DELETE",
           });
           if (!res.ok) {
-            console.error(`Failed to delete file with id: ${item.id}`);
+            console.error(
+              `Failed to delete file with backendId: ${item.backendId}`
+            );
           }
         } catch (error) {
-          console.error(`Error deleting file with id: ${item.id}`, error);
+          console.error(
+            `Error deleting file with backendId: ${item.backendId}`,
+            error
+          );
         }
       })
     );
 
     setUploadQueue([]);
-
     toast.info("Cleared all files from the queue!");
   };
 
