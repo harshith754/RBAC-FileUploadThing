@@ -6,14 +6,11 @@ import { UploadQueueItem } from "@/types/file-upload";
 import { ROLES_ENUM } from "@/types/roles";
 
 export async function getUserFiles(): Promise<UploadQueueItem[]> {
-  const { userId, sessionClaims } = await auth();
+  const { userId } = await auth();
 
   if (!userId) {
     throw new Error("Not authenticated");
   }
-
-  const roles = sessionClaims?.metadata?.role as string[] | string | undefined;
-  const userRoles = Array.isArray(roles) ? roles : [roles].filter(Boolean);
 
   const files = await prisma.file.findMany({
     where: { user: { clerkId: userId } },
@@ -31,8 +28,6 @@ export async function getUserFiles(): Promise<UploadQueueItem[]> {
   }));
 }
 
-
-
 export async function getAllFiles(): Promise<UploadQueueItem[]> {
   const { userId, sessionClaims } = await auth();
 
@@ -42,7 +37,9 @@ export async function getAllFiles(): Promise<UploadQueueItem[]> {
 
   const roles = sessionClaims?.metadata?.role as string[] | string | undefined;
   const userRoles = Array.isArray(roles) ? roles : [roles].filter(Boolean);
-  const isAdmin = userRoles.includes(ROLES_ENUM.ADMIN) || userRoles.includes(ROLES_ENUM.SUPER_ADMIN);
+  const isAdmin =
+    userRoles.includes(ROLES_ENUM.ADMIN) ||
+    userRoles.includes(ROLES_ENUM.SUPER_ADMIN);
 
   const files = await prisma.file.findMany({
     where: isAdmin ? {} : { user: { clerkId: userId } },
@@ -59,4 +56,3 @@ export async function getAllFiles(): Promise<UploadQueueItem[]> {
     message: "Previously uploaded",
   }));
 }
-

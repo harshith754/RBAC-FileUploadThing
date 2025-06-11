@@ -82,7 +82,10 @@ const UploadQueueList: React.FC<UploadQueueListProps> = ({
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => removeFile(item.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeFile(item.id);
+                        }}
                         className="h-6 w-6 p-0"
                         aria-label={`Remove ${item.name}`}
                       >

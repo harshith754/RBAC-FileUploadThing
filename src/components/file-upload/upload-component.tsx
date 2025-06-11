@@ -7,15 +7,19 @@ import { uploadFile } from "@/utils/file-upload";
 import type { UploadQueueItem } from "@/types/file-upload";
 import UploadQueueList from "@/components/file-upload/upload-queue-list";
 import Dropzone from "./dropzone";
-
+import axios from "axios";
+import { toast } from "sonner";
 
 interface FileUploadComponentProps {
   initialFiles: UploadQueueItem[];
 }
 
-const FileUploadComponent: React.FC<FileUploadComponentProps> = ({initialFiles}) => {
-  const [uploadQueue, setUploadQueue] = useState<UploadQueueItem[]>(initialFiles);
-  
+const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
+  initialFiles,
+}) => {
+  const [uploadQueue, setUploadQueue] =
+    useState<UploadQueueItem[]>(initialFiles);
+
   const onDrop = useCallback(
     async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       rejectedFiles.forEach(({ file, errors }) => {
@@ -44,7 +48,11 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({initialFiles})
           errors: errorMessages,
         };
         setUploadQueue((prev) => [...prev, fileObj]);
+        toast.error(`File rejected: ${file.name}`, {
+          description: errorMessages.join(", "),
+        });
       });
+
       acceptedFiles.forEach(async (file) => {
         const fileId = Math.random().toString(36).substr(2, 9);
         const fileObj: UploadQueueItem = {
@@ -56,12 +64,15 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({initialFiles})
           errors: [],
         };
         setUploadQueue((prev) => [...prev, fileObj]);
+
         try {
+          toast.loading(`Uploading ${file.name}...`, { id: fileId });
           const result = await uploadFile(file, (progress: number) => {
             setUploadQueue((prev) =>
               prev.map((f) => (f.id === fileId ? { ...f, progress } : f))
             );
           });
+
           setUploadQueue((prev) =>
             prev.map((f) =>
               f.id === fileId
@@ -74,6 +85,14 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({initialFiles})
                 : f
             )
           );
+
+          if (result.success) {
+            toast.success(`Uploaded ${file.name}`, { id: fileId });
+          } else {
+            toast.error(`Failed to upload ${file.name}: ${result.message}`, {
+              id: fileId,
+            });
+          }
         } catch (error) {
           setUploadQueue((prev) =>
             prev.map((f) =>
@@ -88,14 +107,47 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({initialFiles})
                 : f
             )
           );
+          toast.error(`Error uploading ${file.name}`, {
+            description: error instanceof Error ? error.message : String(error),
+            id: fileId,
+          });
         }
       });
     },
     []
   );
 
-  const removeFile = (fileId: string): void => {
-    setUploadQueue((prev) => prev.filter((f) => f.id !== fileId));
+  const removeFile = async (fileId: string): Promise<void> => {
+    try {
+      await axios.delete(`/api/files/${fileId}`);
+      setUploadQueue((prev) => prev.filter((f) => f.id !== fileId));
+      toast.success("File deleted successfully");
+    } catch (error) {
+      toast.error("Failed to remove file", {
+        description: error instanceof Error ? error.message : String(error),
+      });
+    }
+  };
+
+  const handleClearAll = async () => {
+    await Promise.all(
+      uploadQueue.map(async (item) => {
+        try {
+          const res = await fetch(`/api/files/${item.id}`, {
+            method: "DELETE",
+          });
+          if (!res.ok) {
+            console.error(`Failed to delete file with id: ${item.id}`);
+          }
+        } catch (error) {
+          console.error(`Error deleting file with id: ${item.id}`, error);
+        }
+      })
+    );
+
+    setUploadQueue([]);
+
+    toast.info("Cleared all files from the queue!");
   };
 
   return (
@@ -113,7 +165,7 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({initialFiles})
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setUploadQueue([])}
+              onClick={handleClearAll}
               className="px-3 py-1"
             >
               Clear All
